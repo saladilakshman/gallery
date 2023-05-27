@@ -19,14 +19,19 @@ function App() {
   const[isload,setIsload]=useState(true);
   const[close,setClose]=useState(false);
   const[eventsrc,setEventsrc]=useState('');
-  useEffect(()=>{
+const[alt,setAlt]=useState(true);
+  const datafetching=async(query)=>{
     axios.get(`https://pixabay.com/api/?key=33354789-080f30e2240fbecc7cb3ab93e&category=${query}&image_type=photo`)
     .then(res=>{
       setGallery(res.data.hits)
       setIsload(false)
+      setAlt(false)
     })
     .catch(err=>console.log(err))
-  },[gallery,query])
+  }
+  useEffect(()=>{
+   datafetching(query)
+  },[query])
   const valueChange=(event,Val)=>{
 setQuery(Val);
 setIsload(true)
@@ -46,7 +51,7 @@ setIsload(true)
      <Container sx={{marginBlockEnd:3}}>
       <Stack direction={isMobile?'column-reverse':'row'}justifyContent="center"alignItems="center"sx={{bgcolor:'#'}}>
 <Typography variant={isMobile?'h5':'h3'} textAlign={isMobile?'center':''}color="#357266">Find your favourite Images here!</Typography>
-<img src={cam}alt=""style={{width:isMobile?'100%':'50%',mixBlendMode:'color-burn',boxSizing:'border-box'}}loading="lazy"/>
+{alt?<Skeleton variant="rectangular"sx={{marginBlockStart:3}}height={300}width={isMobile?'100%':'50%'}/>:<img src={cam} id="cam"alt=""style={{width:isMobile?'100%':'50%',mixBlendMode:'color-burn',boxSizing:'border-box'}}loading="lazy"/>}
       </Stack>
       <Autocomplete
       options={categories}
@@ -58,10 +63,12 @@ setIsload(true)
 <ImageList variant="quilted"cols={isMobile?2:3} gap={8} sx={{marginBlockStart:5}}>
   {gallery.map((item)=>{
     const{id,largeImageURL}=item;
-    return <ImageListItem key={id}>
-     {isload?<Skeleton variant="rectangular"sx={{height:340}}/>:
+    return <>
+    <ImageListItem key={id}>
+     {isload?<Skeleton variant="rectangular"sx={{height:300}}/>:
      <img src={largeImageURL}alt=""loading="lazy"style={{width:'100%'}} onClick={opendialog}/>}
     </ImageListItem>
+    </>
   })}
 </ImageList>
      <Dialog 
